@@ -109,7 +109,7 @@
           Cargar Kardex
         </label>
 
-        <button id="newItemButton" type="button"
+        <button id="newItemButton" type="button" hidden
           class="inline-flex items-center gap-2 rounded-xl bg-[#82B340] px-3 py-2 text-sm font-bold text-white shadow-lg shadow-[#82B340]/20 transition hover:bg-[#6f9c35]">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 5v14M5 12h14"/>
@@ -141,9 +141,9 @@
             <path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M20 16.5A3.5 3.5 0 0 0 16.5 13h-1.02A5.5 5.5 0 0 0 5 15.5 3.5 3.5 0 0 0 5.5 22H18a4 4 0 0 0 2-5.5Z"/>
           </svg>
         </div>
-        <h1 class="mt-4 text-xl font-extrabold tracking-tight text-slate-900 lg:text-2xl">Carga tu archivo de Kardex</h1>
+        <h1 class="mt-4 text-xl font-extrabold tracking-tight text-slate-900 lg:text-2xl">Comienza cargando tu archivo .xlsx</h1>
         <p class="mx-auto mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-          Arrastra un archivo Excel aquí o selecciónalo desde tu equipo. La aplicación normaliza los encabezados,
+          Para comenzar, selecciona el archivo Excel del Kardex. La aplicación normaliza los encabezados,
           procesa fechas y cantidades y deja el inventario listo para gestionar.
         </p>
         <button id="mobileLoadButton" type="button" class="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#6F9F35] px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#82B340]/15 transition hover:bg-[#557D29]">
@@ -757,7 +757,8 @@
       els.uploadSection.classList.add("hidden");
       els.dashboard.classList.remove("hidden");
       els.exportButton.disabled = app.rows.length === 0;
-      els.fileNameLabel.textContent = `${app.fileName || "Kardex guardado"} · ${app.rows.length} registros`;
+      els.newItemButton.hidden = app.rows.length === 0;
+      els.fileNameLabel.textContent = `${app.fileName || "Kardex cargado"} · ${app.rows.length} registros`;
     }
 
     function populateFilters() {
@@ -1029,7 +1030,7 @@
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
         app.lastSavedAt = payload.savedAt;
-        els.autosaveStatus.textContent = `Guardado local: ${localDateTime(payload.savedAt)}`;
+        els.autosaveStatus.textContent = `Cambios guardados localmente: ${localDateTime(payload.savedAt)}`;
       } catch (error) {
         console.warn("localStorage no disponible:", error);
         els.autosaveStatus.textContent = "Almacenamiento local no disponible";
@@ -1441,10 +1442,13 @@
     });
 
     // ============================ INICIO ============================
+    // INICIO LIMPIO:
+    // La aplicación no muestra datos ni restaura un Kardex anterior al abrirse.
+    // La primera acción requerida es cargar un archivo Excel.
     renderHead();
-    if (!restoreLocalData()) {
-      els.dashboard.classList.add("hidden");
-    }
+    els.dashboard.classList.add("hidden");
+    els.uploadSection.classList.remove("hidden");
+    els.exportButton.disabled = true;
 
     // Diagnóstico sencillo para GitHub Pages/CDN.
     window.addEventListener("load", () => {
