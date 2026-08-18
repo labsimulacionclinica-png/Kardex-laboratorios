@@ -109,6 +109,15 @@
           Cargar Kardex
         </label>
 
+        <button id="newItemButton" type="button"
+          class="inline-flex items-center gap-2 rounded-xl bg-[#82B340] px-3 py-2 text-sm font-bold text-white shadow-lg shadow-[#82B340]/20 transition hover:bg-[#6f9c35]">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          <span class="hidden sm:inline">Nuevo insumo</span>
+          <span class="sm:hidden">Nuevo</span>
+        </button>
+
         <button id="exportButton" type="button" disabled
           class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-sm font-bold text-white shadow-lg shadow-slate-900/10 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -324,6 +333,34 @@
     </div>
   </div>
 
+
+  <!-- Modal: nuevo insumo -->
+  <div id="newItemModal" class="modal-backdrop fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="fade-in flex max-h-[92vh] w-full max-w-6xl flex-col rounded-3xl bg-white shadow-2xl"
+         role="dialog" aria-modal="true" aria-labelledby="newItemTitle">
+      <div class="flex items-start justify-between gap-4 border-b border-slate-100 p-5 lg:p-6">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest text-[#82B340]">Gestión de inventario</p>
+          <h3 id="newItemTitle" class="mt-1 text-xl font-extrabold tracking-tight text-slate-900">Añadir nuevo insumo</h3>
+          <p class="mt-1 text-sm text-slate-500">Registra un nuevo item usando la misma estructura del Kardex.</p>
+        </div>
+        <button id="closeNewItemModal" type="button"
+          class="rounded-xl p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700" aria-label="Cerrar">✕</button>
+      </div>
+
+      <form id="newItemForm" class="overflow-y-auto p-5 lg:p-6">
+        <div id="newItemFields" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3"></div>
+
+        <div class="mt-5 flex flex-col-reverse gap-2 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
+          <button id="cancelNewItem" type="button"
+            class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50">Cancelar</button>
+          <button type="submit"
+            class="rounded-xl bg-[#82B340] px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#82B340]/20 hover:bg-[#6f9c35]">Añadir al Kardex</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div id="toastContainer" class="pointer-events-none fixed bottom-5 right-5 z-[60] flex max-w-sm flex-col gap-2"></div>
 
@@ -397,6 +434,7 @@
       uploadSection: $("uploadSection"),
       dashboard: $("dashboard"),
       exportButton: $("exportButton"),
+      newItemButton: $("newItemButton"),
       fileNameLabel: $("fileNameLabel"),
       searchInput: $("searchInput"),
       sedeFilter: $("sedeFilter"),
@@ -428,7 +466,12 @@
       closeModal: $("closeModal"),
       cancelConsume: $("cancelConsume"),
       confirmConsume: $("confirmConsume"),
-      toastContainer: $("toastContainer")
+      toastContainer: $("toastContainer"),
+      newItemModal: $("newItemModal"),
+      newItemForm: $("newItemForm"),
+      newItemFields: $("newItemFields"),
+      closeNewItemModal: $("closeNewItemModal"),
+      cancelNewItem: $("cancelNewItem")
     };
 
     function normalizeHeader(value) {
@@ -1044,6 +1087,140 @@
       });
     }
 
+
+    const NEW_ITEM_TYPES = {
+      "CODIGO INSUMO": "text",
+      "CODIGO": "text",
+      "PRESENTACIÓN": "text",
+      "FECHA INGRESO": "date",
+      "CANTIDAD": "number",
+      "LOTE": "text",
+      "FECHA DE VENCIMIENTO": "date",
+      "UBICACIÓN": "text",
+      "SEDE": "text",
+      "STATUS": "text",
+      "PROVEEDOR": "text",
+      "SUBGRUPO": "text",
+      "PRECIO": "number",
+      "REGISTRO SANITARIO": "text",
+      "CLASIFICACIÓN DEL RIESGO": "text",
+      "CENTRO DE COSTO": "text",
+      "OBSERVACION": "textarea"
+    };
+
+    function buildNewItemForm() {
+      els.newItemFields.innerHTML = REQUIRED_COLUMNS.map(column => {
+        const type = NEW_ITEM_TYPES[column] || "text";
+        const required = ["CODIGO INSUMO", "CANTIDAD"].includes(column);
+        const label = `${escapeHTML(column)}${required ? ' <span class="text-rose-500">*</span>' : ''}`;
+        const common = `name="${escapeHTML(column)}" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-[#82B340] focus:ring-4 focus:ring-[#82B340]/10" ${required ? "required" : ""}`;
+
+        if (type === "textarea") {
+          return `
+            <div class="md:col-span-2 xl:col-span-3">
+              <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-500">${label}</label>
+              <textarea ${common} rows="3" maxlength="500" placeholder="Observación opcional"></textarea>
+            </div>`;
+        }
+
+        const placeholder =
+          column === "STATUS" ? "Ej. Disponible" :
+          column === "CANTIDAD" ? "0" :
+          column === "PRECIO" ? "0" :
+          column === "SEDE" ? "Ej. 104" :
+          column === "CENTRO DE COSTO" ? "Ej. CC-SALUD" : "";
+
+        const colSpan = ["CODIGO INSUMO", "PRESENTACIÓN", "PROVEEDOR", "REGISTRO SANITARIO", "CLASIFICACIÓN DEL RIESGO"].includes(column)
+          ? "md:col-span-2 xl:col-span-1" : "";
+
+        return `
+          <div class="${colSpan}">
+            <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-500">${label}</label>
+            <input type="${type}" ${common}
+              ${placeholder ? `placeholder="${escapeHTML(placeholder)}"` : ""}
+              ${type === "number" ? 'min="0" step="any" inputmode="decimal"' : ""} />
+          </div>`;
+      }).join("");
+
+      const statusField = els.newItemForm.elements["STATUS"];
+      if (statusField) statusField.value = "Disponible";
+
+      const ingresoField = els.newItemForm.elements["FECHA INGRESO"];
+      if (ingresoField) ingresoField.value = todayISO();
+    }
+
+    function openNewItemModal() {
+      if (!app.rows.length) {
+        showToast("Primero carga un Kardex para poder añadir un insumo.", "error");
+        return;
+      }
+      buildNewItemForm();
+      els.newItemModal.classList.remove("hidden");
+      els.newItemModal.classList.add("flex");
+      setTimeout(() => {
+        const field = els.newItemForm.elements["CODIGO INSUMO"];
+        if (field) field.focus();
+      }, 50);
+    }
+
+    function closeNewItemModal() {
+      els.newItemModal.classList.add("hidden");
+      els.newItemModal.classList.remove("flex");
+    }
+
+    function formValue(column) {
+      const field = els.newItemForm.elements[column];
+      if (!field) return "";
+      if (DATE_FIELDS.has(column)) return parseDate(field.value);
+      if (NUMBER_FIELDS.has(column)) return parseNumber(field.value);
+      return sanitizeText(field.value);
+    }
+
+    function addNewItem(event) {
+      event.preventDefault();
+
+      if (!app.rows.length) {
+        showToast("Primero carga un Kardex.", "error");
+        return;
+      }
+
+      const newRow = {};
+      REQUIRED_COLUMNS.forEach(column => {
+        newRow[column] = formValue(column);
+      });
+
+      if (!newRow["CODIGO INSUMO"]) {
+        showToast("El campo CODIGO INSUMO es obligatorio.", "error");
+        return;
+      }
+
+      if (newRow["CANTIDAD"] < 0) {
+        showToast("La cantidad no puede ser negativa.", "error");
+        return;
+      }
+
+      if (!newRow["STATUS"]) {
+        newRow["STATUS"] = newRow["CANTIDAD"] > 0 ? "Disponible" : "Agotado";
+      }
+
+      const maxOrder = app.rows.reduce(
+        (max, row) => Math.max(max, Number(row.__originalOrder) || 0), -1
+      );
+
+      newRow.__originalOrder = maxOrder + 1;
+      newRow.__id = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
+      app.rows.push(newRow);
+      app.page = Math.max(1, Math.ceil(app.rows.length / PAGE_SIZE));
+
+      populateFilters();
+      saveLocalData();
+      render();
+      closeNewItemModal();
+
+      showToast(`Nuevo insumo añadido: ${newRow["CODIGO INSUMO"]}.`, "success", 4500);
+    }
+
     function exportWorkbook() {
       if (!app.rows.length) {
         showToast("No hay registros para exportar.", "error");
@@ -1243,6 +1420,8 @@
     document.addEventListener("keydown", e => {
       if (e.key === "Escape" && !els.consumeModal.classList.contains("hidden")) {
         closeConsumeModal();
+      } else if (e.key === "Escape" && !els.newItemModal.classList.contains("hidden")) {
+        closeNewItemModal();
       }
     });
 
@@ -1250,6 +1429,16 @@
     setInterval(() => {
       if (app.rows.length) saveLocalData();
     }, 30000);
+
+
+    els.newItemButton.addEventListener("click", openNewItemModal);
+    els.closeNewItemModal.addEventListener("click", closeNewItemModal);
+    els.cancelNewItem.addEventListener("click", closeNewItemModal);
+    els.newItemForm.addEventListener("submit", addNewItem);
+
+    els.newItemModal.addEventListener("click", e => {
+      if (e.target === els.newItemModal) closeNewItemModal();
+    });
 
     // ============================ INICIO ============================
     renderHead();
