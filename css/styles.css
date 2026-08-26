@@ -1,0 +1,211 @@
+/* ============================================================
+   KARDEX DE CONTROL DE INSUMOS - Estilos personalizados
+   (Tailwind por CDN; aquí van los estilos propios y modo oscuro)
+   ============================================================ */
+
+:root {
+  --primary: #82B340;
+  --primary-2: #E69324;
+  --accent: #D91978;
+  --green-dark: #6F9F35;
+  --surface: #f7fafc;
+  --thead-bg: #0f3d5e;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background:
+    radial-gradient(circle at top right, rgba(130, 179, 64, .10), transparent 34%),
+    linear-gradient(180deg, #f8fbfd 0%, #f1f5f9 100%);
+  color: #172033;
+}
+
+.glass {
+  background: rgba(255, 255, 255, .86);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Scrollbars de tablas anchas */
+.table-scroll::-webkit-scrollbar { height: 9px; width: 9px; }
+.table-scroll::-webkit-scrollbar-track { background: #eef2f7; }
+.table-scroll::-webkit-scrollbar-thumb { background: #a8b6c5; border-radius: 99px; }
+
+.drop-zone.dragover {
+  border-color: var(--primary);
+  background: rgba(130, 179, 64, .10);
+  transform: translateY(-1px);
+}
+
+.modal-backdrop { background: rgba(15, 23, 42, .55); }
+
+.sticky-col {
+  position: sticky;
+  left: 0;
+  z-index: 15;
+  background: white;
+  box-shadow: 6px 0 12px -12px rgba(15, 23, 42, .35);
+}
+
+th.sticky-col { background: var(--thead-bg); z-index: 25; }
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .25rem .55rem;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.brand-logo {
+  width: 50px; height: 50px;
+  object-fit: contain;
+  border-radius: 14px;
+  background: white;
+  padding: 4px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .08);
+}
+
+.institutional-line {
+  height: 4px;
+  background: linear-gradient(90deg, #E69324 0 33%, #82B340 33% 66%, #D91978 66% 100%);
+}
+
+.fade-in { animation: fadeIn .22s ease-out; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Pestañas */
+.tab-btn {
+  padding: .55rem 1rem;
+  border-radius: .75rem;
+  font-size: .8125rem;
+  font-weight: 700;
+  color: #475569;
+  transition: all .15s ease;
+}
+.tab-btn:hover:not(.tab-btn-active) { background: #f8fafc; color: #1e293b; }
+.tab-btn-active,
+.tab-btn-active:hover {
+  background: var(--primary);
+  color: #fff !important;
+  box-shadow: 0 10px 15px -3px rgba(130, 179, 64, .30);
+}
+
+/* Encabezados ordenables */
+.th-sort { cursor: pointer; user-select: none; }
+.th-sort:hover .sort-arrow { opacity: 1 !important; color: #d9f99d; }
+.sort-arrow { font-size: 9px; }
+
+/* Gráficas */
+.chart-box { position: relative; height: 280px; }
+
+/* Video del escáner */
+#scannerVideo {
+  width: 100%;
+  max-height: 46vh;
+  border-radius: 1rem;
+  background: #0f172a;
+  object-fit: cover;
+}
+
+/* Botones de icono en header */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: .75rem;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  font-size: 1rem;
+  line-height: 1;
+  transition: all .15s ease;
+}
+.icon-btn:hover { border-color: var(--primary); background: #F0F7E8; }
+
+:focus-visible {
+  outline: 3px solid rgba(130, 179, 64, .6);
+  outline-offset: 2px;
+}
+
+/* Inputs de fecha con ancho mínimo razonable */
+input[type="date"] { min-width: 8.5rem; }
+
+/* ============================================================
+   MODO OSCURO
+   Sobrescribe las utilidades claras más comunes sin tocar el HTML.
+   Se activa con la clase `dark` en <html>.
+   ============================================================ */
+
+html.dark body {
+  background:
+    radial-gradient(circle at top right, rgba(130, 179, 64, .12), transparent 34%),
+    linear-gradient(180deg, #0b1220 0%, #0f172a 100%);
+  color: #e2e8f0;
+}
+
+html.dark .glass { background: rgba(15, 23, 42, .78); }
+
+html.dark .bg-white { background-color: #0f172a !important; }
+html.dark .bg-slate-50, html.dark .bg-slate-50\/70 { background-color: #16213a !important; }
+html.dark .bg-slate-100 { background-color: #1e293b !important; }
+html.dark .hover\:bg-slate-50:hover { background-color: #1e293b !important; }
+html.dark .hover\:bg-slate-100:hover { background-color: #24304a !important; }
+html.dark .group-hover\:bg-\[\#F0F7E8\]\/30:hover { background-color: rgba(130, 179, 64, .10) !important; }
+
+html.dark .text-slate-900 { color: #f1f5f9 !important; }
+html.dark .text-slate-800 { color: #e2e8f0 !important; }
+html.dark .text-slate-700 { color: #cbd5e1 !important; }
+html.dark .text-slate-600 { color: #94a3b8 !important; }
+html.dark .text-slate-500 { color: #94a3b8 !important; }
+html.dark .text-slate-400 { color: #64748b !important; }
+
+html.dark .border-slate-600 { border-color: #334155 !important; }
+html.dark .border-slate-300 { border-color: #334155 !important; }
+html.dark .border-slate-200 { border-color: #293548 !important; }
+html.dark .border-slate-100 { border-color: #22304a !important; }
+html.dark .hover\:border-slate-300:hover { border-color: #475569 !important; }
+
+html.dark .sticky-col { background: #101c33; box-shadow: 6px 0 12px -12px rgba(0, 0, 0, .8); }
+
+html.dark .table-scroll::-webkit-scrollbar-track { background: #16213a; }
+html.dark .table-scroll::-webkit-scrollbar-thumb { background: #33415c; }
+
+html.dark input, html.dark select, html.dark textarea {
+  background-color: #0f172a !important;
+  color: #e2e8f0 !important;
+  border-color: #334155 !important;
+}
+html.dark input::placeholder, html.dark textarea::placeholder { color: #64748b; }
+html.dark [type="date"]::-webkit-calendar-picker-indicator { filter: invert(.8); }
+
+html.dark .modal-backdrop { background: rgba(2, 6, 23, .72); }
+
+html.dark .brand-logo { background: #16213a; box-shadow: 0 6px 16px rgba(0, 0, 0, .5); }
+
+html.dark .icon-btn { background: #0f172a; border-color: #334155; }
+html.dark .icon-btn:hover { background: #16213a; border-color: var(--primary); }
+
+html.dark .tab-btn { color: #94a3b8; }
+html.dark .tab-btn:hover:not(.tab-btn-active) { background: #1e293b; color: #e2e8f0; }
+
+html.dark .status-pill.bg-emerald-50 { background: rgba(16, 185, 129, .12) !important; color: #6ee7b7 !important; }
+html.dark .status-pill.bg-rose-50 { background: rgba(244, 63, 94, .12) !important; color: #fda4af !important; }
+html.dark .status-pill.bg-amber-50 { background: rgba(245, 158, 11, .14) !important; color: #fcd34d !important; }
+html.dark .status-pill.bg-slate-100 { background: #1e293b !important; color: #94a3b8 !important; }
+html.dark .status-pill.ring-rose-200 { --tw-ring-color: rgba(244, 63, 94, .35) !important; }
+
+html.dark #validationList li { background: rgba(244, 63, 94, .08) !important; border-color: rgba(244, 63, 94, .25) !important; }
+
+html.dark .chart-box canvas { filter: none; }
+
+html.dark .toast-light { background: #0f172a !important; }

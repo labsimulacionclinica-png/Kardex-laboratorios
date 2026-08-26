@@ -1,0 +1,26 @@
+{
+  "name": "Kardex de Control de Insumos",
+  "short_name": "Kardex",
+  "description": "Control de inventario y consumos de insumos - Fundación Universitaria del Área Andina",
+  "lang": "es",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f8fbfd",
+  "theme_color": "#82B340",
+  "icons": [
+    {
+      "src": "./assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
